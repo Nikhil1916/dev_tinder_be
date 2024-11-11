@@ -96,17 +96,28 @@ app.get("/feed",async(req,res)=>{
   }
 });
 
-app.put("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.put("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
   try {
+    const ALLOWED_UPDATES = ['photoUrl', 'about', 'gender', 'age' , 'skills'];
+    const isUpdateAllowed = Object.keys(req.body)?.every((k)=>
+      ALLOWED_UPDATES.includes(k)
+    )
+    console.log(isUpdateAllowed);
+    if(!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if(data?.skills?.length > 10) {
+      throw new Error("Skills cannot be more than 10");
+    }
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
     });
     console.log(user);
     res.send("User updated successfully");
   } catch (err) {
-    res.status(400).send("Something went wrong ");
+    res.status(400).send(err?.message);
   }
 });
 
