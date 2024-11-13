@@ -3,7 +3,7 @@ const app = express();
 const { adminAuth } = require("./middlewares/auth");
 const { User } = require("./model/user");
 const {connectDB} = require("./config/database");
-const {validateSignUpData} = require("./utils/validation");
+const {validateSignUpData, validateLoginData} = require("./utils/validation");
 const bcrypt = require("bcrypt");
 
 app.use(adminAuth);
@@ -39,6 +39,34 @@ app.post("/signup",async (req,res)=>{
             msg:'not able to create user'
         })
     }
+});
+
+app.post("/login",async(req,res)=>{
+  try {
+    // console.log(req.body);
+    validateLoginData(req);
+    const {emailId , password} = req.body;
+    const user = await User.findOne({
+      emailId
+    });
+
+    if(!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(isPasswordValid) {
+      return res.json({
+        msg:'User logged in'
+      })
+    } else {
+      throw new Error("Invalid credentials");
+    }
+
+  } catch(e) {
+    return res.status(400).json({
+      error: e?.message
+    })
+  }
 });
 
 
