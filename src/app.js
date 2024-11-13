@@ -3,7 +3,8 @@ const app = express();
 const { adminAuth } = require("./middlewares/auth");
 const { User } = require("./model/user");
 const {connectDB} = require("./config/database");
-
+const {validateSignUpData} = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(adminAuth);
 
@@ -15,17 +16,26 @@ app.get("/health",(req,res)=>{
   })
 })
 
-app.post("/login",async (req,res)=>{
-  console.log("done");
-    const userObj = new User(req.body);
-    try {
+app.post("/signup",async (req,res)=>{
+  try {
+        validateSignUpData(req);
+        const { firstName, lastName, emailId, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const userObj = new User(
+          {
+            firstName,
+            lastName,
+            emailId,
+            password: hashedPassword
+          }
+        );
         const user = await userObj.save();
         return res.json({
             user
         })
     } catch(e) {
         return res.status(422).json({
-            e,
+            err: e?.message,
             msg:'not able to create user'
         })
     }
