@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { adminAuth } = require("./middlewares/auth");
+const { adminAuth, userAuth } = require("./middlewares/auth");
 const { User } = require("./model/user");
 const {connectDB} = require("./config/database");
 const {validateSignUpData, validateLoginData} = require("./utils/validation");
@@ -59,10 +59,10 @@ app.post("/login",async(req,res)=>{
     if(!user) {
       throw new Error("Invalid credentials");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = user.validatePassword(password);
     if(isPasswordValid) {
-      // res.cookie("token","okoko");
-      const token = await jwt.sign({ _id: user._id }, JWT_SECRET);
+      const token = await user.getJwt();
       res.cookie("token", token);
       return res.json({
         msg:'User logged in'
@@ -176,20 +176,9 @@ app.use((err,req,res,next)=>{
   }
 });
 
-app.get("/profile",async(req,res)=>{
+app.get("/profile",userAuth, async(req,res)=>{
   try {
-    const cookies = req.cookies;
-    console.log(cookies);
-
-    const decodedMsg = jwt.verify(cookies?.token, JWT_SECRET);
-    console.log(decodedMsg);
-    const { _id } = decodedMsg;
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User does not exist");
-    }
-    return res.send(user);
-    // return res.json({})
+    return res.send(req.user);
   } catch(e) {
     return res.status(400).json({
       error: e?.message

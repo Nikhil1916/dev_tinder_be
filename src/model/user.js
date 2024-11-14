@@ -1,5 +1,9 @@
+
 const mongoose = require("mongoose");
 const validator = require('validator');
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = "my_secret";
 const userSchema = new mongoose.Schema({
     firstName:{
         type:'string',
@@ -59,6 +63,22 @@ const userSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+userSchema.methods.getJwt = async function() {
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+    });
+    return token;
+}
+
+userSchema.methods.validatePassword = async function (params) {
+    const {password} = params;
+    //this here refer to the document as in route we will do user.validatePassword so this in validatePassword
+    // points to that user document
+    const isPasswordValid = await bcrypt.compare(password, this.password);
+    return isPasswordValid;
+}
 
 
 const User = mongoose.model("User", userSchema);
