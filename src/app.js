@@ -5,10 +5,14 @@ const { User } = require("./model/user");
 const {connectDB} = require("./config/database");
 const {validateSignUpData, validateLoginData} = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = "my_secret";
 
 app.use(adminAuth);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/health",(req,res)=>{
   res.json({
@@ -50,11 +54,16 @@ app.post("/login",async(req,res)=>{
       emailId
     });
 
+
+
     if(!user) {
       throw new Error("Invalid credentials");
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if(isPasswordValid) {
+      // res.cookie("token","okoko");
+      const token = await jwt.sign({ _id: user._id }, JWT_SECRET);
+      res.cookie("token", token);
       return res.json({
         msg:'User logged in'
       })
@@ -163,6 +172,27 @@ app.use((err,req,res,next)=>{
   if(err) {
     res.json({
         err
+    })
+  }
+});
+
+app.get("/profile",async(req,res)=>{
+  try {
+    const cookies = req.cookies;
+    console.log(cookies);
+
+    const decodedMsg = jwt.verify(cookies?.token, JWT_SECRET);
+    console.log(decodedMsg);
+    const { _id } = decodedMsg;
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+    return res.send(user);
+    // return res.json({})
+  } catch(e) {
+    return res.status(400).json({
+      error: e?.message
     })
   }
 })
