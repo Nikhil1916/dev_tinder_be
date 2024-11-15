@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const { adminAuth, userAuth } = require("./middlewares/auth");
 const { User } = require("./model/user");
-const {connectDB} = require("./config/database");
-const {validateSignUpData, validateLoginData} = require("./utils/validation");
+const { connectDB } = require("./config/database");
+const { validateSignUpData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
-const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const JWT_SECRET = "my_secret";
 
 app.use(adminAuth);
@@ -14,177 +14,82 @@ app.use(adminAuth);
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/health",(req,res)=>{
+app.get("/health", (req, res) => {
   res.json({
-    msg:'healthy server'
-  })
-})
-
-app.post("/signup",async (req,res)=>{
-  try {
-        validateSignUpData(req);
-        const { firstName, lastName, emailId, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const userObj = new User(
-          {
-            firstName,
-            lastName,
-            emailId,
-            password: hashedPassword
-          }
-        );
-        const user = await userObj.save();
-        return res.json({
-            user
-        })
-    } catch(e) {
-        return res.status(422).json({
-            err: e?.message,
-            msg:'not able to create user'
-        })
-    }
+    msg: "healthy server",
+  });
 });
 
-app.post("/login",async(req,res)=>{
+app.post("/signup", async (req, res) => {
+  try {
+    validateSignUpData(req);
+    const { firstName, lastName, emailId, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userObj = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: hashedPassword,
+    });
+    const user = await userObj.save();
+    return res.json({
+      user,
+    });
+  } catch (e) {
+    return res.status(422).json({
+      err: e?.message,
+      msg: "not able to create user",
+    });
+  }
+});
+
+app.post("/login", async (req, res) => {
   try {
     // console.log(req.body);
     validateLoginData(req);
-    const {emailId , password} = req.body;
+    const { emailId, password } = req.body;
     const user = await User.findOne({
-      emailId
+      emailId,
     });
 
-
-
-    if(!user) {
+    if (!user) {
       throw new Error("Invalid credentials");
     }
     // const isPasswordValid = await bcrypt.compare(password, user.password);
     const isPasswordValid = user.validatePassword(password);
-    if(isPasswordValid) {
+    if (isPasswordValid) {
       const token = await user.getJwt();
       res.cookie("token", token);
       return res.json({
-        msg:'User logged in'
-      })
+        msg: "User logged in",
+      });
     } else {
       throw new Error("Invalid credentials");
     }
-
-  } catch(e) {
+  } catch (e) {
     return res.status(400).json({
-      error: e?.message
-    })
-  }
-});
-
-
-app.get("/user",async(req,res)=>{
-  const {emailId} = req.body;
-  console.log(emailId);
-  try {
-    const user = await User.findOne({emailId:emailId});
-    if(user) {
-      return res.json({
-        user
-      })
-    } else {
-      return res.json({
-        msg:'user not found'
-      })
-    }
-  } catch(e) {
-    return res.status(400).json({
-      msg:'user not found'
-    })
-  }
-});
-
-
-app.delete("/user",async(req,res)=>{
-  const {_id} = req.body;
-  // console.log(emailId);
-  try {
-    const user = await User.findOneAndDelete({_id});
-    if(user) {
-      return res.json({
-        user,
-        msg:'user deleted'
-      })
-    } else {
-      return res.json({
-        msg:'user not found'
-      })
-    }
-  } catch(e) {
-    return res.status(400).json({
-      msg:'user not found'
-    })
-  }
-});
-
-
-app.get("/feed",async(req,res)=>{
-  try {
-    const users = await User.find();
-    if(users.length) {
-      return res.json({
-        users
-      })
-    } else {
-      return res.json({
-        msg:'users not found'
-      })
-    }
-  } catch(e) {
-    return res.status(400).json({
-      msg:'users not found'
-    })
-  }
-});
-
-app.put("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-  try {
-    const ALLOWED_UPDATES = ['photoUrl', 'about', 'gender', 'age' , 'skills'];
-    const isUpdateAllowed = Object.keys(req.body)?.every((k)=>
-      ALLOWED_UPDATES.includes(k)
-    )
-    console.log(isUpdateAllowed);
-    if(!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if(data?.skills?.length > 10) {
-      throw new Error("Skills cannot be more than 10");
-    }
-    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
+      error: e?.message,
     });
-    console.log(user);
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send(err?.message);
   }
 });
 
-app.use((err,req,res,next)=>{
-  if(err) {
-    res.json({
-        err
-    })
-  }
-});
-
-app.get("/profile",userAuth, async(req,res)=>{
+app.get("/profile", userAuth, async (req, res) => {
   try {
     return res.send(req.user);
-  } catch(e) {
+  } catch (e) {
     return res.status(400).json({
-      error: e?.message
-    })
+      error: e?.message,
+    });
   }
-})
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    res.json({
+      err,
+    });
+  }
+});
 
 connectDB()
   .then(() => {
@@ -195,4 +100,4 @@ connectDB()
   })
   .catch((err) => {
     console.error("Database cannot be connected!!");
-});
+  });
