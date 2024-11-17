@@ -1,14 +1,5 @@
-// const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const { User } = require('../model/user');
-const adminAuth = (req, res, next) => {
-  const token = "xyz";
-  if (token == "xyz") {
-    next();
-  } else {
-    return res.status(401).send("token is wrong");
-  }
-};
 
 const userAuth = async (req, res, next) => {
   try {
@@ -31,6 +22,5 @@ const userAuth = async (req, res, next) => {
 };
 
 module.exports = {
-  adminAuth,
   userAuth
 };
