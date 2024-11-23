@@ -6,10 +6,16 @@ const {
   validateLoginData,
 } = require("../utils/validation");
 const bcrypt = require("bcrypt");
-const { signUpSchema } = require("../utils/types");
+const { signUpSchema, loginSchema } = require("../utils/types");
 
 authRouter.post("/signup", async (req, res) => {
   try {
+    const isInputValid = signUpSchema.safeParse(req.body);
+    if(!isInputValid.success) {
+      return res.status(400).json({
+        error:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
+      })
+    }
     validateSignUpData(req);
     const { firstName, lastName, emailId, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,7 +39,12 @@ authRouter.post("/signup", async (req, res) => {
 
 authRouter.post("/login", async (req, res) => {
   try {
-    // console.log(req.body);
+    const isInputValid = loginSchema.safeParse(req.body);
+    if(!isInputValid.success) {
+      return res.status(400).json({
+        error:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
+      })
+    }
     validateLoginData(req);
     const { emailId, password } = req.body;
     const user = await User.findOne({

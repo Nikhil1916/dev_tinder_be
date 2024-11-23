@@ -1,6 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const { validateEditProfileData } = require("../utils/validation");
+const { editProfileSchema } = require("../utils/types");
 const profileRouter = express.Router();
 
 
@@ -19,6 +20,13 @@ profileRouter.get("/view", async (req, res) => {
 profileRouter.patch("/edit",async (req,res)=>{
 
   try {
+    const isInputValid = editProfileSchema.safeParse(req.body);
+    console.log(isInputValid, req.body);
+    if(!isInputValid.success) {
+      return res.status(400).json({
+        error:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
+      })
+    }
     validateEditProfileData(req);
     const loggedInUser = req.user;
     Object.keys(req.body)?.forEach(key=>loggedInUser[key] = req.body[key]);
