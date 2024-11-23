@@ -1,3 +1,5 @@
+// todo: add input validation for all body data
+
 const express = require("express");
 const app = express();
 const { connectDB } = require("./config/database");
