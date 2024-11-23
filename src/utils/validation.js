@@ -16,7 +16,6 @@ const validateSignUpData = (req) => {
 
 const validateLoginData = (req) => {
     const {emailId, password} = req.body;
-    // console.log(req.body);
     if(!validator.isEmail(emailId)) {
         throw new Error("Email is not valid");
     }
@@ -26,7 +25,26 @@ const validateLoginData = (req) => {
     }
 }
 
+const validateEditProfileData = (req) => {
+    const allowedEditableFields = [
+        "firstName",
+        "lastName",
+        "emailId",
+        "age",
+        "gender",
+        "photoUrl",
+        "skills"
+    ];
+
+
+    const isEditAllowed = Object.keys(req.body)?.every((key)=>allowedEditableFields?.includes(key));
+    if(!isEditAllowed) {
+        throw new Error("Invalid edit request");
+    }
+}
+
 module.exports = {
     validateSignUpData,
-    validateLoginData
+    validateLoginData,
+    validateEditProfileData
 }

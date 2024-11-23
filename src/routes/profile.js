@@ -1,17 +1,42 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
+const { validateEditProfileData } = require("../utils/validation");
 const profileRouter = express.Router();
 
-profileRouter.get("/", userAuth, async (req, res) => {
-    try {
-      return res.send(req.user);
-    } catch (e) {
-      return res.status(400).json({
-        error: e?.message,
-      });
-    }
-  });
+
+profileRouter.use(userAuth);
+profileRouter.get("/view", async (req, res) => {
+  try {
+    return res.send(req.user);
+  } catch (e) {
+    return res.status(400).json({
+      error: e?.message,
+    });
+  }
+});
+
+
+profileRouter.patch("/edit",async (req,res)=>{
+
+  try {
+    validateEditProfileData(req);
+    const loggedInUser = req.user;
+    Object.keys(req.body)?.forEach(key=>loggedInUser[key] = req.body[key]);
+
+    await loggedInUser.save();
+    res.json({
+      msg:`${loggedInUser._id} data updated`,
+      data: loggedInUser
+    })
+  } catch(e) {
+    res.json({
+      err:'unable to update user '+e?.message
+    })
+  }
+
+});
+
 
 module.exports = {
-    profileRouter
-}
+  profileRouter,
+};
