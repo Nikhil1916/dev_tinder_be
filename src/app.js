@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 app.use(express.json());
 app.use(cookieParser());
 
@@ -18,7 +19,7 @@ app.get("/health", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/request", requestRouter);
-
+app.use("/user",userRouter);
 app.use((err, req, res, next) => {
   if (err) {
     res.json({

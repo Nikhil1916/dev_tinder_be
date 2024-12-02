@@ -21,7 +21,7 @@ profileRouter.patch("/edit",async (req,res)=>{
 
   try {
     const isInputValid = editProfileSchema.safeParse(req.body);
-    console.log(isInputValid, req.body);
+    // console.log(isInputValid, req.body);
     if(!isInputValid.success) {
       return res.status(400).json({
         error:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
