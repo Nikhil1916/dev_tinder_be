@@ -110,7 +110,9 @@ userRouter.get("/feed", userAuth, async (req, res) => {
           },
         },
       ],
-    }).select(SAFE_DATA).skip(skip).limit(limit);
+    }).select(SAFE_DATA).skip(skip).limit(limit).sort({
+      $natural: -1
+    });
     return res.json({
       users
     })
