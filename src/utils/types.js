@@ -2,12 +2,12 @@ const { z } = require("zod");
 const signUpSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
-  emailId: z.string(),
+  emailId: z.coerce.string().email(),
   password: z.string(),
 });
 
 const loginSchema = z.object({
-  emailId: z.string(),
+  emailId: z.coerce.string().email(),
   password: z.string(),
 });
 

@@ -51,7 +51,6 @@ authRouter.post("/login", async (req, res) => {
     const user = await User.findOne({
       emailId,
     }).select(SAFE_DATA);
-
     if (!user) {
       throw new Error("Invalid credentials");
     }
