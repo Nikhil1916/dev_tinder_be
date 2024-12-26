@@ -7,7 +7,7 @@ const {
 } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const { signUpSchema, loginSchema } = require("../utils/types");
-const SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+const SAFE_DATA = "firstName lastName photoUrl age gender about skills emailId _id";
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -50,7 +50,7 @@ authRouter.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
     const user = await User.findOne({
       emailId,
-    }).select(SAFE_DATA);
+    });
     if (!user) {
       throw new Error("Invalid credentials");
     }
@@ -58,9 +58,11 @@ authRouter.post("/login", async (req, res) => {
     if (isPasswordValid) {
       const token = await user.getJwt();
       res.cookie("token", token);
+      const userD = user?.toJSON();
+      delete userD.password;
       return res.json({
         msg: "User logged in",
-        user
+        user: userD
       });
     } else {
       throw new Error("Invalid credentials");

@@ -82,7 +82,7 @@ userSchema.methods.validatePassword = async function (params) {
     const isPasswordValid = await bcrypt.compare(password, this.password);
     return isPasswordValid;
   } catch (e) {
-    throw Error("Invalid credentials" + e);
+    throw Error("Invalid credentials" + e?.message);
   }
 };
 
