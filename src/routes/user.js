@@ -3,7 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const userRouter = express.Router();
 const ConnectionRequestModel = require("../model/connectionRequest");
 const SAFE_DATA = "firstName lastName photoUrl age gender about skills";
-const {User} = require("../model/user");
+const { User } = require("../model/user");
 userRouter.get("/requests/recieved", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -110,16 +110,20 @@ userRouter.get("/feed", userAuth, async (req, res) => {
           },
         },
       ],
-    }).select(SAFE_DATA).skip(skip).limit(limit).sort({
-      $natural: -1
-    });
-    return res.json({
-      users
     })
+      .select(SAFE_DATA)
+      .skip(skip)
+      .limit(limit)
+      .sort({
+        $natural: -1,
+      });
+    return res.json({
+      data: users,
+    });
   } catch (e) {
     res.status(500).json({
-      error:e?.message
-    })
+      error: e?.message,
+    });
   }
 });
 module.exports = userRouter;
