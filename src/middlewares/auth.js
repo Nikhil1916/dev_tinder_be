@@ -17,6 +17,9 @@ const userAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (e) {
+    if(e.message == "jwt expired") {
+      e.message = "token validation failed"
+    }
     res.status(400).send("ERROR: " + e.message);
   }
 };
