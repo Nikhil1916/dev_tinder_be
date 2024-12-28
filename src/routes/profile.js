@@ -17,8 +17,7 @@ profileRouter.get("/view", async (req, res) => {
 });
 
 
-profileRouter.patch("/edit",async (req,res)=>{
-
+profileRouter.put("/edit",async (req,res)=>{
   try {
     const isInputValid = editProfileSchema.safeParse(req.body);
     if(!isInputValid.success) {
@@ -36,7 +35,7 @@ profileRouter.patch("/edit",async (req,res)=>{
       data: loggedInUser
     })
   } catch(e) {
-    res.json({
+    res.status(400).json({
       err:'unable to update user '+e?.message
     })
   }
