@@ -38,7 +38,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     await connectionRequest.save(); 
     res.send(user.firstName + " sent the connect request! to "+ toUser.firstName);
   } catch(e) {
-    res.send("Error "+ e?.message);
+    res.status(404).send("Error "+ e?.message);
   }
 });
 

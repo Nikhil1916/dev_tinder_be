@@ -4,7 +4,7 @@ const userRouter = express.Router();
 const ConnectionRequestModel = require("../model/connectionRequest");
 const SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 const { User } = require("../model/user");
-userRouter.get("/requests/recieved", userAuth, async (req, res) => {
+userRouter.get("/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
     const connectionRequests = await ConnectionRequestModel.find({
@@ -14,6 +14,7 @@ userRouter.get("/requests/recieved", userAuth, async (req, res) => {
     if (!connectionRequests) {
       return res.json({
         msg: "no connection request found",
+        data: []
       });
     }
 
