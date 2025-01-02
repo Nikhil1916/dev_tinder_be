@@ -14,7 +14,7 @@ authRouter.post("/signup", async (req, res) => {
     const isInputValid = signUpSchema.safeParse(req.body);
     if(!isInputValid.success) {
       return res.status(400).json({
-        error:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
+        err:isInputValid?.error?.issues?.[0]?.path?.[0]+" is "+ isInputValid?.error?.issues?.[0]?.message
       })
     }
     validateSignUpData(req);
@@ -27,6 +27,8 @@ authRouter.post("/signup", async (req, res) => {
       password: hashedPassword,
     });
     const user = await userObj.save();
+    const token = await user.getJwt();
+    res.cookie("token", token);
     return res.json({
       user,
     });
