@@ -40,7 +40,7 @@ app.use((err, req, res, next) => {
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-    app.listen(3000, () => {
+    app.listen(7777, () => {
       console.log("Server is successfully listening on port 3000...");
     });
   })
