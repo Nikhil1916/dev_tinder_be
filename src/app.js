@@ -1,4 +1,5 @@
 // todo: add input validation for all body data
+//create new application with typescript
 
 const express = require("express");
 const app = express();
