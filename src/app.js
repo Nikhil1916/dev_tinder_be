@@ -9,6 +9,7 @@ const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+require("dotenv").config();
 const corsOptions = {
   origin: 'http://localhost:5173', // Replace with your frontend's URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed HTTP methods
@@ -40,7 +41,7 @@ app.use((err, req, res, next) => {
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-    app.listen(7777, () => {
+    app.listen(process.env.PORT, () => {
       console.log("Server is successfully listening on port 7777...");
     });
   })
