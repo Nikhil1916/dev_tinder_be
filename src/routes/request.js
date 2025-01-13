@@ -13,14 +13,14 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     if(!toUser) {
       return res.status(404).json({ message: "User not found!" });
     }
-    const emailRes = await sendEmail.run(
-      "A new friend request from " + req.user.firstName,
-      req.user.firstName + " is " + status + " in your profile",
-      "nikhilchawla9013@gmail.com" 
-    );
-    console.log(emailRes);
-    res.json({email:emailRes});
-    return;
+    // const emailRes = await sendEmail.run(
+    //   "A new friend request from " + req.user.firstName,
+    //   req.user.firstName + " is " + status + " in your profile",
+    //   "nikhilchawla9013@gmail.com" 
+    // );
+    // console.log(emailRes);
+    // res.json({email:emailRes});
+    // return;
     const existingConnectionRequest = await ConnectionRequest.findOne({
       $or:[
         { fromUserId, toUserId },
