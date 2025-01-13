@@ -3,13 +3,13 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-// require("dotenv").config();
 const { connectDB } = require("./config/database");
 const cookieParser = require("cookie-parser");
 const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+require("dotenv").config();
 const corsOptions = {
   origin: 'http://localhost:5173', // Replace with your frontend's URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed HTTP methods
