@@ -36,13 +36,16 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     });
 
     await connectionRequest.save(); 
-    // const emailRes = await sendEmail.run(
-    //   "A new friend request from " + req.user.firstName,
-    //   req.user.firstName + " is " + status + " in your profile",
-    //   "nikhilchawla9013@gmail.com" 
-    // );
-    // console.log(emailRes);
-    res.send(user.firstName + " sent the connect request! to "+ toUser.firstName);
+    if(status == "interested") {
+      const emailRes = await sendEmail.run(
+        "A new friend request from " + req.user.firstName,
+        req.user.firstName + " is " + status + " in your profile",
+        toUser?.emailId
+      );
+      res.send(user.firstName + " sent the connect request to "+ toUser.firstName);
+    } else {
+      res.send(user.firstName + " ignored "+ toUser.firstName);
+    }
   } catch(e) {
     console.log(e);
     console.log(e.stack);
