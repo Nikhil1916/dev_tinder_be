@@ -10,6 +10,7 @@ const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+require("./utils/cronjob");
 const corsOptions = {
   origin: 'http://localhost:5173', // Replace with your frontend's URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed HTTP methods
